@@ -1,27 +1,49 @@
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class HttpResponse {
     private String responseMessage;
-    private final OutputStream outputStream;
-    public HttpResponse(Socket socket) throws IOException {
-        this.outputStream = socket.getOutputStream();
+    private byte[] body;
+    private String status;
+    private Map<String,String> headers;
+
+    public HttpResponse(){
     }
-    public void buildResponse(String status, String length, String body){
-        String response = "HTTP/1.1 %s\r\nContent-Type: text/plain\r\nContent-Length: %s\r\n\r\n%s";
-        this.responseMessage = String.format(response,status,length,body);
+    public byte[] toBytes() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("HTTP/1.1 ")
+                .append(status)
+                .append("\r\n");
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            builder.append(entry.getKey())
+                    .append(": ")
+                    .append(entry.getValue())
+                    .append("\r\n");
+        }
+        builder.append("\r\n");
+        byte[] headerBytes = builder.toString().getBytes(StandardCharsets.UTF_8);
+        if (body == null) {
+            return headerBytes;
+        }
+        byte[] response = new byte[headerBytes.length + body.length];
+        System.arraycopy(headerBytes, 0, response, 0, headerBytes.length);
+        System.arraycopy(body, 0, response, headerBytes.length, body.length);
+        return response;
     }
-    public void buildResponse(String status){
-        String response = "HTTP/1.1 %s\r\n\r\n";
-        this.responseMessage = String.format(response,status);
+    public void setBody(byte[] body){
+        this.body = body.clone();
     }
-    public void write() throws IOException{
-        outputStream.write(responseMessage.getBytes());
-        outputStream.flush();
+    public void setHeaders(String key, String value){
+        this.headers.put(key,value);
     }
-    public void close() throws IOException {
-        outputStream.close();
+    public void setStatus(String status){
+        this.status = status;
     }
 
+    public void setBody() {
+
+    }
 }

@@ -2,29 +2,17 @@ import java.io.*;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class HttpRequest {
-    private final String requestLine;
-    private final Map<String,String> requestHeaders;
-    private final byte[] body;
-    private final String method;
-    private final String path;
-    public HttpRequest(Socket socket) throws IOException {
-        InputStream inputStream = socket.getInputStream();
-        String requestHeader = readHeaders(inputStream);
-        String[] lines = requestHeader.split("\r\n");
-        this.requestLine = lines[0];
-        this.method = requestLine.split(" ")[0];
-        this.path = requestLine.split(" ")[1];
-        this.requestHeaders = parseHeaders(lines);
-        int contentLength = 0;
-        if (requestHeaders.containsKey("content-length")) {
-            contentLength = Integer.parseInt(
-                    requestHeaders.get("content-length")
-            );
-        }
-        this.body = inputStream.readNBytes(contentLength);
-        inputStream.close();
+    private String requestLine;
+    private Map<String,String> requestHeaders;
+    private byte[] body;
+    private String method;
+    private String path;
+    private Optional<String> directory;
+    public HttpRequest(){
+
     }
 
     private String readHeaders(InputStream input) throws IOException {
@@ -63,19 +51,53 @@ public class HttpRequest {
         }
         return headers;
     }
+
+    public String getFileContent(){
+        String filePath = "" + path.split("/")[2];
+        return filePath;
+    }
+
     public String getRequestLine() {
         return requestLine;
     }
+
     public String getMethod(){
         return this.method;
     }
+
     public String getPath(){
         return this.path;
     }
+
     public String getHeader(String name) {
         return requestHeaders.get(name.toLowerCase());
     }
+
     public byte[] getBody() {
         return body;
+    }
+
+    public void setDirectory(Optional<String> directory) {
+        this.directory = directory;
+    }
+
+    public void setRequestLine(String requestLine) {
+        this.requestLine = requestLine;
+    }
+
+    public void setRequestHeaders(Map<String, String> requestHeaders) {
+        this.requestHeaders = requestHeaders;
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }
