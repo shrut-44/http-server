@@ -2,15 +2,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 public class HttpResponse {
-    private String responseMessage;
     private byte[] body;
     private String status;
     private Map<String,String> headers;
 
     public HttpResponse(){
+        this.headers = new HashMap<>();
     }
     public byte[] toBytes() {
         StringBuilder builder = new StringBuilder();

@@ -12,11 +12,6 @@ public class HttpRequest {
     private String path;
     private Optional<String> directory;
 
-    public String getFileContent(){
-        String filePath = "" + path.split("/")[2];
-        return filePath;
-    }
-
     public String getRequestLine() {
         return requestLine;
     }

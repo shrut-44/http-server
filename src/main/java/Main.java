@@ -10,10 +10,17 @@ public class Main {
   public static void main(String[] args) {
       try {
           HttpServer httpServer = new HttpServer(4221);
-          Optional<String> directory = args[1].describeConstable();
+          Optional<String> directory = Optional.empty();
+          for (int i = 0; i < args.length - 1; i++) {
+              if ("--directory".equals(args[i])) {
+                  directory = Optional.of(args[i + 1]);
+                  break;
+              }
+          }
           while(true){
               final Socket socket = httpServer.accept();
-              Thread.startVirtualThread(() -> httpServer.handleClient(socket, directory));
+              Optional<String> finalDirectory = directory;
+              Thread.startVirtualThread(() -> httpServer.handleClient(socket, finalDirectory));
           }
 
       } catch (IOException e) {

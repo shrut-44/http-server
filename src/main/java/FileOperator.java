@@ -3,15 +3,17 @@ import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.nio.file.Files;
 public class FileOperator {
-    private final String pathStr;
-    public FileOperator(String pathStr){
-        this.pathStr = pathStr;
+    private final Path fullPath;
+    public FileOperator(String dirPath, String fileName){
+        this.fullPath = Paths.get(dirPath,fileName);
+    }
+    public boolean doesExist(){
+        return Files.exists(fullPath);
     }
     public String getFileContent(){
-        Path path = Paths.get(pathStr);
+
         try {
-            String content = Files.readString(path);
-            return content;
+            return Files.readString(fullPath);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
