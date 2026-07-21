@@ -11,46 +11,6 @@ public class HttpRequest {
     private String method;
     private String path;
     private Optional<String> directory;
-    public HttpRequest(){
-
-    }
-
-    private String readHeaders(InputStream input) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        int b;
-        int[] lastFour = new int[4];
-        int index = 0;
-        while ((b = input.read()) != -1) {
-            buffer.write(b);
-            lastFour[index % 4] = b;
-            index++;
-            if (index >= 4 &&
-                    lastFour[(index - 4) % 4] == '\r' &&
-                    lastFour[(index - 3) % 4] == '\n' &&
-                    lastFour[(index - 2) % 4] == '\r' &&
-                    lastFour[(index - 1) % 4] == '\n') {
-                break;
-            }
-        }
-        return buffer.toString(java.nio.charset.StandardCharsets.ISO_8859_1);
-    }
-
-    private Map<String, String> parseHeaders(String[] lines) {
-        Map<String, String> headers = new HashMap<>();
-        for (int i = 1; i < lines.length; i++) {
-            String line = lines[i];
-            if (line.isEmpty()) {
-                continue;
-            }
-            String[] parts = line.split(":", 2);
-            if (parts.length == 2) {
-                String name = parts[0].trim();
-                String value = parts[1].trim();
-                headers.put(name.toLowerCase(), value);
-            }
-        }
-        return headers;
-    }
 
     public String getFileContent(){
         String filePath = "" + path.split("/")[2];
@@ -71,6 +31,10 @@ public class HttpRequest {
 
     public String getHeader(String name) {
         return requestHeaders.get(name.toLowerCase());
+    }
+
+    public Optional<String> getDirectory() {
+        return directory;
     }
 
     public byte[] getBody() {

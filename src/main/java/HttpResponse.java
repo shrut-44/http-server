@@ -42,8 +42,4 @@ public class HttpResponse {
     public void setStatus(String status){
         this.status = status;
     }
-
-    public void setBody() {
-
-    }
 }

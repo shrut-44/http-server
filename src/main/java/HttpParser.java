@@ -3,15 +3,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class HttpParser {
     private final InputStream inputStream;
     private HttpRequest httpRequest;
+    private Optional<String> directory;
     public HttpParser(InputStream inputStream){
         this.inputStream = inputStream;
     }
+    public HttpParser(InputStream inputStream, Optional<String> directory){
+        this.inputStream = inputStream;
+        this.directory = directory;
+    }
+
     public HttpRequest parse() throws IOException {
         httpRequest = new HttpRequest();
+        httpRequest.setDirectory(directory);
         String requestHeader = readHeaders(inputStream);
         String[] lines = requestHeader.split("\r\n");
         httpRequest.setRequestLine(lines[0]);
