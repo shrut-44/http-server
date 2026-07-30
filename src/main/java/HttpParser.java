@@ -18,9 +18,12 @@ public class HttpParser {
     }
 
     public HttpRequest parse() throws IOException {
+        String requestHeader = readHeaders(inputStream);
+        if (requestHeader == null) {
+            return null; // Signals EOF to handleClient
+        }
         httpRequest = new HttpRequest();
         httpRequest.setDirectory(directory);
-        String requestHeader = readHeaders(inputStream);
         String[] lines = requestHeader.split("\r\n");
         httpRequest.setRequestLine(lines[0]);
         httpRequest.setMethod(lines[0].split(" ")[0]);
@@ -67,6 +70,9 @@ public class HttpParser {
                     lastFour[(index - 2) % 4] == '\r' &&
                     lastFour[(index - 1) % 4] == '\n') {
                 break;
+            }
+            if (index == 0 && b == -1) {
+                return null;
             }
         }
         return buffer.toString(java.nio.charset.StandardCharsets.ISO_8859_1);

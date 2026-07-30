@@ -21,14 +21,23 @@ public class HttpServer {
 //        serverSocket.close();
 //    }
     public void handleClient(Socket socket, Optional<String> directory){
-        try{
+        try(socket){
             InputStream inputStream = socket.getInputStream();
-            HttpRequest httpRequest = new HttpParser(inputStream, directory).parse();
-            HttpResponse httpResponse = new Router(httpRequest).route();
             OutputStream outputStream = socket.getOutputStream();
-            outputStream.write(httpResponse.toBytes());
-            outputStream.flush();
-            socket.close();
+            while(true){
+                if(inputStream.available()==0 && socket.isClosed()){
+                    break;
+                }
+                HttpRequest httpRequest = new HttpParser(inputStream, directory).parse();
+                HttpResponse httpResponse = new Router(httpRequest).route();
+                outputStream.write(httpResponse.toBytes());
+                outputStream.flush();
+                String connectionHeader = httpRequest.getHeader("Connection");
+                if ("close".equalsIgnoreCase(connectionHeader)) {
+                    break;
+                }
+            }
+
         }catch (IOException e){
             throw new RuntimeException(e);
         }
